@@ -2,7 +2,18 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-export async function middleware(request: NextRequest) {
+export const config = {
+  matcher: [
+    "/feed/:path*",
+    "/files/:path*",
+    "/calendar/:path*",
+    "/maintenance/:path*",
+    "/profile/:path*",
+    "/admin/:path*",
+  ],
+};
+
+export default async function proxy(request: NextRequest) {
   if (!process.env.NEXTAUTH_SECRET) {
     return NextResponse.next();
   }
@@ -20,14 +31,3 @@ export async function middleware(request: NextRequest) {
   loginUrl.searchParams.set("callbackUrl", request.nextUrl.pathname);
   return NextResponse.redirect(loginUrl);
 }
-
-export const config = {
-  matcher: [
-    "/feed/:path*",
-    "/files/:path*",
-    "/calendar/:path*",
-    "/maintenance/:path*",
-    "/profile/:path*",
-    "/admin/:path*",
-  ],
-};
