@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { MaintenancePriority } from "@prisma/client";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 const priorityValues = new Set(["LOW", "NORMAL", "HIGH", "URGENT"]);
@@ -53,6 +54,9 @@ export async function POST(request: Request) {
     }
 
     const normalizedPriority = String(priority || "NORMAL").toUpperCase();
+    const priorityValue = priorityValues.has(normalizedPriority)
+      ? (normalizedPriority as MaintenancePriority)
+      : MaintenancePriority.NORMAL;
     let photoUrl: string | null = null;
     let photoFileName: string | null = null;
     let photoMimeType: string | null = null;
@@ -112,9 +116,7 @@ export async function POST(request: Request) {
         photoFileName,
         photoMimeType,
         photoSize,
-        priority: priorityValues.has(normalizedPriority)
-          ? normalizedPriority
-          : "NORMAL",
+        priority: priorityValue,
         submittedById: session.user.id,
         organizationId,
       },
