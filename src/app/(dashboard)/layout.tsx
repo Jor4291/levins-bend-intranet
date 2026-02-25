@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 const navItems = [
   { href: "/feed", label: "Announcements" },
@@ -6,26 +9,42 @@ const navItems = [
   { href: "/calendar", label: "Calendar" },
   { href: "/maintenance", label: "Maintenance" },
   { href: "/profile", label: "Profile" },
+  { href: "/settings", label: "Settings", adminOnly: true },
 ];
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerSession(authOptions);
+  let isAdmin = false;
+
+  if (session?.user?.id) {
+    const membership = await prisma.userOrganization.findFirst({
+      where: { userId: session.user.id },
+    });
+    isAdmin =
+      membership?.role === "ORG_ADMIN" || Boolean(session.user.isSystemAdmin);
+  }
+
+  const visibleNavItems = navItems.filter(
+    (item) => !item.adminOnly || isAdmin
+  );
+
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-sky-100/60">
       <div className="flex min-h-screen">
-        <aside className="hidden w-64 flex-col border-r border-slate-200 bg-white px-6 py-8 lg:flex">
+        <aside className="hidden w-64 flex-col border-r border-sky-100 bg-white/95 px-6 py-8 lg:flex">
           <div className="text-lg font-semibold text-slate-900">
             Levin's Bend
           </div>
-          <nav className="mt-8 space-y-2 text-sm font-medium text-slate-600">
-            {navItems.map((item) => (
+          <nav className="mt-8 space-y-2 text-sm font-medium text-slate-700">
+            {visibleNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="block rounded-lg px-3 py-2 hover:bg-slate-100 hover:text-slate-900"
+                className="block rounded-lg px-3 py-2 hover:bg-sky-200/70 hover:text-slate-900"
               >
                 {item.label}
               </Link>
@@ -34,14 +53,14 @@ export default function DashboardLayout({
         </aside>
 
         <div className="flex-1">
-          <header className="border-b border-slate-200 bg-white">
+          <header className="border-b border-sky-200 bg-sky-100/80">
             <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-4">
-              <div className="text-sm font-medium text-slate-600">
-                Organization: Levin's Bend Condominiums
+              <div className="text-sm font-semibold text-slate-900">
+                Levin's Bend Condominiums
               </div>
               <Link
                 href="/"
-                className="text-sm font-medium text-slate-600 hover:text-slate-900"
+                className="text-sm font-medium text-slate-700 hover:text-slate-900"
               >
                 Sign out
               </Link>

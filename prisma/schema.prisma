@@ -112,6 +112,10 @@ model MaintenanceRequest {
   title          String
   description    String              @db.Text
   unit           String?
+  photoUrl       String?
+  photoFileName  String?
+  photoMimeType  String?
+  photoSize      Int?
   priority       MaintenancePriority @default(NORMAL)
   status         MaintenanceStatus   @default(OPEN)
   submittedById  String

@@ -21,7 +21,7 @@ export default async function FeedPage() {
             Announcements
           </h1>
           <p className="mt-1 text-sm text-slate-600">
-            Latest updates from your association board.
+            Latest updates from the Levin's Bend board.
           </p>
         </header>
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -46,12 +46,12 @@ export default async function FeedPage() {
             Announcements
           </h1>
           <p className="mt-1 text-sm text-slate-600">
-            Latest updates from your association board.
+            Latest updates from the Levin's Bend board.
           </p>
         </header>
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <p className="text-sm text-slate-500">
-            You are not assigned to an organization yet.
+            Your account is not linked to Levin's Bend yet.
           </p>
         </div>
       </section>
@@ -75,7 +75,7 @@ export default async function FeedPage() {
             Announcements
           </h1>
           <p className="mt-1 text-sm text-slate-600">
-            Latest updates from your association board.
+            Latest updates from the Levin's Bend board.
           </p>
         </div>
       </header>
@@ -106,13 +106,34 @@ export default async function FeedPage() {
                 className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
               >
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <h2 className="text-lg font-semibold text-slate-900">
-                      {announcement.title}
-                    </h2>
-                    <p className="mt-1 text-xs text-slate-500">
-                      {authorName} · {formatDate(announcement.createdAt)}
-                    </p>
+                  <div className="flex items-start gap-3">
+                    <div className="h-10 w-10 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
+                      {announcement.author.avatarUrl ? (
+                        <img
+                          src={announcement.author.avatarUrl}
+                          alt={`${authorName} avatar`}
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-[10px] font-medium text-slate-400">
+                          {announcement.author.firstName
+                            .charAt(0)
+                            .toUpperCase()}
+                          {announcement.author.lastName
+                            .charAt(0)
+                            .toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-900">
+                        {announcement.title}
+                      </h2>
+                      <p className="mt-1 text-xs text-slate-500">
+                        {authorName} · {formatDate(announcement.createdAt)}
+                      </p>
+                    </div>
                   </div>
                   {announcement.isPinned ? (
                     <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
@@ -126,9 +147,9 @@ export default async function FeedPage() {
                 <div className="mt-4">
                   <a
                     href={mailto}
-                    className="text-sm font-medium text-slate-700 hover:text-slate-900"
+                    className="inline-flex items-center rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:border-slate-400 hover:text-slate-900"
                   >
-                    Contact organizer
+                    Send Message
                   </a>
                 </div>
               </article>

@@ -19,14 +19,17 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
+          console.warn("Auth: missing credentials");
           return null;
         }
 
+        const normalizedEmail = credentials.email.toLowerCase();
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email.toLowerCase() },
+          where: { email: normalizedEmail },
         });
 
         if (!user) {
+          console.warn("Auth: user not found", { email: normalizedEmail });
           return null;
         }
 
@@ -36,6 +39,7 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!isValid) {
+          console.warn("Auth: invalid password", { email: normalizedEmail });
           return null;
         }
 

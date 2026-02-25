@@ -1,16 +1,107 @@
-export default function CalendarPage() {
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import CalendarEventForm from "./CalendarEventForm";
+import CalendarMonthView from "./CalendarMonthView";
+import CalendarEventFeed from "./CalendarEventFeed";
+
+export default async function CalendarPage() {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    return (
+      <section className="space-y-6">
+        <header>
+          <h1 className="text-2xl font-semibold text-slate-900">Calendar</h1>
+          <p className="mt-1 text-sm text-slate-600">
+            Track Levin's Bend events and meetings.
+          </p>
+        </header>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <p className="text-sm text-slate-500">
+            Please sign in to view the calendar.
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  const membership = await prisma.userOrganization.findFirst({
+    where: { userId: session.user.id },
+    include: { organization: true },
+  });
+
+  if (!membership) {
+    return (
+      <section className="space-y-6">
+        <header>
+          <h1 className="text-2xl font-semibold text-slate-900">Calendar</h1>
+          <p className="mt-1 text-sm text-slate-600">
+            Track Levin's Bend events and meetings.
+          </p>
+        </header>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <p className="text-sm text-slate-500">
+            Your account is not linked to Levin's Bend yet.
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  const events = await prisma.event.findMany({
+    where: { organizationId: membership.organizationId },
+    orderBy: { startDate: "asc" },
+  });
+  const calendarEvents = events.map((event) => ({
+    id: event.id,
+    title: event.title,
+    startDate: event.startDate.toISOString(),
+    endDate: event.endDate ? event.endDate.toISOString() : null,
+    isAllDay: event.isAllDay,
+  }));
+  const feedEvents = events.map((event) => ({
+    id: event.id,
+    title: event.title,
+    description: event.description,
+    location: event.location,
+    startDate: event.startDate.toISOString(),
+    endDate: event.endDate ? event.endDate.toISOString() : null,
+    isAllDay: event.isAllDay,
+  }));
+
+  const canCreate =
+    membership.role === "ORG_ADMIN" || Boolean(session.user.isSystemAdmin);
+
   return (
     <section className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold text-slate-900">Calendar</h1>
-        <p className="mt-1 text-sm text-slate-600">
-          Track community events and meeting schedules.
-        </p>
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Calendar</h1>
+          <p className="mt-1 text-sm text-slate-600">
+            Track Levin's Bend events and meetings.
+          </p>
+        </div>
       </header>
 
-      <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">
-        Calendar view will render here once events are connected.
-      </div>
+      {canCreate ? (
+        <CalendarEventForm organizationId={membership.organizationId} />
+      ) : null}
+
+      <CalendarMonthView events={calendarEvents} />
+
+      {events.length === 0 ? (
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <p className="text-sm text-slate-500">
+            No upcoming events yet. Check back soon.
+          </p>
+        </div>
+      ) : (
+        <CalendarEventFeed
+          events={feedEvents}
+          canEdit={canCreate}
+        />
+      )}
     </section>
   );
 }
