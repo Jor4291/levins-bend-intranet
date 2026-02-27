@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import AnnouncementForm from "./AnnouncementForm";
+import AnnouncementList from "./AnnouncementList";
 
 function formatDate(value: Date) {
   return new Intl.DateTimeFormat("en-US", {
@@ -91,71 +92,22 @@ export default async function FeedPage() {
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {announcements.map((announcement) => {
-            const authorName = `${announcement.author.firstName} ${announcement.author.lastName}`;
-            const mailto = `mailto:${announcement.author.email}?subject=${encodeURIComponent(
-              `Re: ${announcement.title}`
-            )}&body=${encodeURIComponent(
-              `Regarding your announcement "${announcement.title}":\n\n`
-            )}`;
-
-            return (
-              <article
-                key={announcement.id}
-                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex items-start gap-3">
-                    <div className="h-10 w-10 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
-                      {announcement.author.avatarUrl ? (
-                        <img
-                          src={announcement.author.avatarUrl}
-                          alt={`${authorName} avatar`}
-                          className="h-full w-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-[10px] font-medium text-slate-400">
-                          {announcement.author.firstName
-                            .charAt(0)
-                            .toUpperCase()}
-                          {announcement.author.lastName
-                            .charAt(0)
-                            .toUpperCase()}
-                        </div>
-                      )}
-                    </div>
-                    <div>
-                      <h2 className="text-lg font-semibold text-slate-900">
-                        {announcement.title}
-                      </h2>
-                      <p className="mt-1 text-xs text-slate-500">
-                        {authorName} · {formatDate(announcement.createdAt)}
-                      </p>
-                    </div>
-                  </div>
-                  {announcement.isPinned ? (
-                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                      Pinned
-                    </span>
-                  ) : null}
-                </div>
-                <p className="mt-4 whitespace-pre-line text-sm text-slate-700">
-                  {announcement.content}
-                </p>
-                <div className="mt-4">
-                  <a
-                    href={mailto}
-                    className="inline-flex items-center rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:border-slate-400 hover:text-slate-900"
-                  >
-                    Send Message
-                  </a>
-                </div>
-              </article>
-            );
-          })}
-        </div>
+        <AnnouncementList
+          canManage={canPost}
+          announcements={announcements.map((announcement) => ({
+            id: announcement.id,
+            title: announcement.title,
+            content: announcement.content,
+            isPinned: announcement.isPinned,
+            createdAt: formatDate(announcement.createdAt),
+            author: {
+              firstName: announcement.author.firstName,
+              lastName: announcement.author.lastName,
+              email: announcement.author.email,
+              avatarUrl: announcement.author.avatarUrl,
+            },
+          }))}
+        />
       )}
     </section>
   );

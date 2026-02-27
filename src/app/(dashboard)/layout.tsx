@@ -1,15 +1,23 @@
 import Link from "next/link";
+import {
+  CalendarDays,
+  Folder,
+  Megaphone,
+  Settings as SettingsIcon,
+  User,
+  Wrench,
+} from "lucide-react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 const navItems = [
-  { href: "/feed", label: "Announcements" },
-  { href: "/files", label: "Files" },
-  { href: "/calendar", label: "Calendar" },
-  { href: "/maintenance", label: "Maintenance" },
-  { href: "/profile", label: "Profile" },
-  { href: "/settings", label: "Settings", adminOnly: true },
+  { href: "/feed", label: "Announcements", icon: Megaphone },
+  { href: "/files", label: "Files", icon: Folder },
+  { href: "/calendar", label: "Calendar", icon: CalendarDays },
+  { href: "/maintenance", label: "Maintenance", icon: Wrench },
+  { href: "/profile", label: "Profile", icon: User },
+  { href: "/settings", label: "Settings", icon: SettingsIcon, adminOnly: true },
 ];
 
 export default async function DashboardLayout({
@@ -44,8 +52,9 @@ export default async function DashboardLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                className="block rounded-lg px-3 py-2 hover:bg-sky-200/70 hover:text-slate-900"
+                className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-sky-200/70 hover:text-slate-900"
               >
+                <item.icon className="h-4 w-4 text-slate-500" />
                 {item.label}
               </Link>
             ))}

@@ -92,24 +92,23 @@ export default function CalendarEventFeed({
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="border-b border-slate-200 px-6 py-4">
+    <div className="space-y-4">
+      <div className="rounded-2xl border border-slate-200 bg-white px-6 py-4 shadow-sm">
         <h2 className="text-base font-semibold text-slate-900">Event feed</h2>
         <p className="mt-1 text-xs text-slate-500">
           Upcoming events in chronological order.
         </p>
       </div>
-      <div className="divide-y divide-slate-200">
-        {events.map((event) => {
-          const isEditing = editingId === event.id;
-          return (
-            <div
-              key={event.id}
-              id={`event-${event.id}`}
-              className="scroll-mt-24 px-6 py-4"
-            >
-              {isEditing ? (
-                <form onSubmit={(e) => handleUpdate(e, event.id)}>
+      {events.map((event) => {
+        const isEditing = editingId === event.id;
+        return (
+          <div
+            key={event.id}
+            id={`event-${event.id}`}
+            className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+          >
+            {isEditing ? (
+              <form onSubmit={(e) => handleUpdate(e, event.id)}>
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2 md:col-span-2">
                       <label
@@ -226,57 +225,56 @@ export default function CalendarEventFeed({
                       Cancel
                     </button>
                   </div>
-                </form>
-              ) : (
-                <>
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-medium text-slate-900">
-                        {event.title}
-                      </p>
-                      <p className="mt-1 text-xs text-slate-500">
-                        {formatDateTime(event.startDate, event.isAllDay)}
-                        {event.endDate
-                          ? ` → ${formatDateTime(event.endDate, event.isAllDay)}`
-                          : ""}
-                      </p>
-                      {event.location ? (
-                        <p className="mt-1 text-xs text-slate-500">
-                          {event.location}
-                        </p>
-                      ) : null}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {event.isAllDay ? (
-                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                          All day
-                        </span>
-                      ) : null}
-                      {canEdit ? (
-                        <button
-                          type="button"
-                          className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                          onClick={() => {
-                            setEditingId(event.id);
-                            setError(null);
-                          }}
-                        >
-                          Edit
-                        </button>
-                      ) : null}
-                    </div>
-                  </div>
-                  {event.description ? (
-                    <p className="mt-3 text-sm text-slate-700">
-                      {event.description}
+              </form>
+            ) : (
+              <>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-slate-900">
+                      {event.title}
                     </p>
-                  ) : null}
-                </>
-              )}
-            </div>
-          );
-        })}
-      </div>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {formatDateTime(event.startDate, event.isAllDay)}
+                      {event.endDate
+                        ? ` → ${formatDateTime(event.endDate, event.isAllDay)}`
+                        : ""}
+                    </p>
+                    {event.location ? (
+                      <p className="mt-1 text-xs text-slate-500">
+                        {event.location}
+                      </p>
+                    ) : null}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {event.isAllDay ? (
+                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                        All day
+                      </span>
+                    ) : null}
+                    {canEdit ? (
+                      <button
+                        type="button"
+                        className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                        onClick={() => {
+                          setEditingId(event.id);
+                          setError(null);
+                        }}
+                      >
+                        Edit
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+                {event.description ? (
+                  <p className="mt-3 text-sm text-slate-700">
+                    {event.description}
+                  </p>
+                ) : null}
+              </>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

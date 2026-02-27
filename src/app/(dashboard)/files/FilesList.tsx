@@ -1,5 +1,6 @@
 "use client";
 
+import { Download, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -71,10 +72,11 @@ export default function FilesList({
             <div className="flex items-center gap-3">
               <a
                 href={file.fileUrl}
-                className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
+                className="inline-flex items-center gap-1 rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
                 target="_blank"
                 rel="noreferrer"
               >
+                <Download className="h-3.5 w-3.5" />
                 Download
               </a>
               {canDelete ? (
@@ -82,8 +84,9 @@ export default function FilesList({
                   type="button"
                   onClick={() => handleDelete(file.id)}
                   disabled={isDeleting === file.id}
-                  className="rounded-full border border-rose-200 px-3 py-1 text-xs font-semibold text-rose-700 transition hover:border-rose-300 hover:text-rose-800 disabled:cursor-not-allowed disabled:border-rose-100 disabled:text-rose-300"
+                  className="inline-flex items-center gap-1 rounded-full border border-rose-200 px-3 py-1 text-xs font-semibold text-rose-700 transition hover:border-rose-300 hover:text-rose-800 disabled:cursor-not-allowed disabled:border-rose-100 disabled:text-rose-300"
                 >
+                  <Trash2 className="h-3.5 w-3.5" />
                   {isDeleting === file.id ? "Deleting..." : "Delete"}
                 </button>
               ) : null}
