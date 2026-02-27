@@ -35,7 +35,6 @@ export default function MaintenanceRequestsList({
   requests,
   statusLabels,
   priorityLabels,
-  formatDate,
 }: MaintenanceRequestsListProps) {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState<string | null>(null);
