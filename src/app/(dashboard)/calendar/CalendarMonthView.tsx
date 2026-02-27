@@ -107,11 +107,23 @@ export default function CalendarMonthView({ events }: CalendarMonthViewProps) {
   function handleEventClick(eventId: string) {
     const target = document.getElementById(`event-${eventId}`);
     if (target) {
+      document
+        .querySelectorAll(".calendar-flash")
+        .forEach((element) => element.classList.remove("calendar-flash", "bg-sky-50", "ring-2", "ring-sky-200"));
       target.scrollIntoView({ behavior: "smooth", block: "start" });
-      target.classList.add("bg-slate-50", "ring-1", "ring-slate-200");
+      target.classList.add("calendar-flash", "bg-sky-100", "ring-4", "ring-sky-300");
       window.setTimeout(() => {
-        target.classList.remove("bg-slate-50", "ring-1", "ring-slate-200");
-      }, 1200);
+        target.classList.add("calendar-flash-out");
+      }, 600);
+      window.setTimeout(() => {
+        target.classList.remove(
+          "calendar-flash",
+          "calendar-flash-out",
+          "bg-sky-100",
+          "ring-4",
+          "ring-sky-300"
+        );
+      }, 2600);
     }
   }
 

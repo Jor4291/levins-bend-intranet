@@ -173,3 +173,56 @@ export async function PATCH(request: Request) {
     );
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { id } = body ?? {};
+
+    if (!id) {
+      return NextResponse.json({ error: "Event id is required." }, { status: 400 });
+    }
+
+    const existingEvent = await prisma.event.findUnique({
+      where: { id: String(id) },
+    });
+
+    if (!existingEvent) {
+      return NextResponse.json({ error: "Event not found." }, { status: 404 });
+    }
+
+    const isSystemAdmin = Boolean(session.user.isSystemAdmin);
+    if (!isSystemAdmin) {
+      const membership = await prisma.userOrganization.findFirst({
+        where: {
+          userId: session.user.id,
+          organizationId: existingEvent.organizationId,
+        },
+      });
+
+      if (membership?.role !== "ORG_ADMIN") {
+        return NextResponse.json(
+          { error: "Only org admins can delete events." },
+          { status: 403 }
+        );
+      }
+    }
+
+    await prisma.event.delete({
+      where: { id: existingEvent.id },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Event delete error", error);
+    return NextResponse.json(
+      { error: "Unable to delete event." },
+      { status: 500 }
+    );
+  }
+}
